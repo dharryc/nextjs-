@@ -1,0 +1,22 @@
+# Node
+node_modules/
+.pnpm-debug.log*
+npm-debug.log*
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Next.js build / caches
+.next/
+out/
+
+# local env files
+.env
+.env.local
+.env.*.local
+
+# system files
+.DS_Store
+.vscode/
+.idea/
+dist/
