@@ -33,7 +33,6 @@ A lightweight, opt-in Trading Card Game (TCG) for the BSSE cohort. The goal is s
 | Epic      | Long-serving teachers, special event promos                 |
 | Legendary | Hall-of-fame professors, anniversary editions               |
 
-> Note: This table is a suggested mapping. Implementation may use fewer tiers or different names.
 
 ## Game mechanics ideas
 
