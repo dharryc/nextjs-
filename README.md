@@ -74,3 +74,18 @@ If you want, I can:
 - Turn this into a `README.md` with badges and design mockups.
 - Create a JSON schema for the cards and a tiny Node/Python script to simulate chest drops.
 - Draft the opt-in form text and a sample privacy notice.
+
+
+| Level  | Common | Uncommon | Rare | Legendary |
+| :----- | -----: | -------: | ---: | --------: |
+| 1      |      1 |        1 |    1 |         1 |
+| 1 → 2  |      5 |        4 |    2 |         1 |
+| 2 → 3  |     10 |        8 |    3 |         1 |
+| 3 → 4  |     25 |       15 |    4 |         2 |
+| 4 → 5  |     50 |       25 |    8 |         3 |
+| 5 → 6  |     75 |       40 |   16 |         5 |
+| 6 → 7  |    100 |       80 |   25 |         8 |
+| 7 → 8  |    200 |      125 |   40 |        12 |
+| 8 → 9  |    500 |      175 |   60 |        16 |
+| 9 → 10 |   1000 |      300 |  100 |        20 |
+|Total cards | 1966| 733     |  259 |        69 |
