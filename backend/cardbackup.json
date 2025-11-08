@@ -1,0 +1,20 @@
+[
+    {
+    "card_name": "Marc",
+    "path_to_image": "https://images.stockcake.com/public/c/2/6/c26bc523-2fe1-481f-88c7-54a35b17c2c8_large/bakers-at-work-stockcake.jpg",
+    "blurb": "Marc. Makes. BREAD.",
+    "card_rarity": "rare"
+  },
+  {
+    "card_name": "Kyler",
+    "path_to_image": "https://www.shutterstock.com/image-photo/hacker-260nw-88204819.jpg",
+    "blurb": "Kyler really do be hackin",
+    "card_rarity": "legendary"
+  },
+  {
+    "card_name": "Harry",
+    "path_to_image": "https://static.independent.co.uk/s3fs-public/thumbnails/image/2013/09/12/17/potter.jpg",
+    "blurb": "Unlike other nerds, Harry has a girlfriend",
+    "card_rarity": "uncommon"
+  }
+]

@@ -2,7 +2,7 @@ import jwt
 from pydantic import BaseModel
 from pwdlib import PasswordHash
 from models.card import CardDTO
-from models.user import UserDTO
+from models.user import UserDTO, User
 import sqlite3, hashlib, random, string
 from jwt.exceptions import InvalidTokenError
 from typing import Annotated, List, Annotated
@@ -16,18 +16,6 @@ SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-
-fake_users_db = {
-    "johndoe": {
-        "username": "johndoe",
-        "full_name": "John Doe",
-        "email": "johndoe@example.com",
-        "hashed_password": "$argon2id$v=19$m=65536,t=3,p=4$wagCPXjifgvUFBzq4hqe3w$CYaIb8sB+wtD+Vu/P4uod1+Qof8h+1g7bbDlBID48Rc",
-        "disabled": False,
-    }
-}
-
-
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -35,17 +23,6 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: str | None = None
-
-
-class User(BaseModel):
-    username: str
-    email: str | None = None
-    full_name: str | None = None
-    disabled: bool | None = None
-
-
-class UserInDB(User):
-    hashed_password: str
 
 
 password_hash = PasswordHash.recommended()
@@ -67,25 +44,26 @@ def generate_random_string(length):
 
 app = FastAPI()
 
-def verify_password(plain_password, hashed_password):
-    return password_hash.verify(plain_password, hashed_password)
+def verify_password(plain_password, salt, hashed_password):
+    return password_hash.verify((plain_password + salt), hashed_password)
 
 
 def get_password_hash(password):
     return password_hash.hash(password)
 
 
-def get_user(db, username: str):
-    if username in db:
-        user_dict = db[username]
-        return UserInDB(**user_dict)
+def get_user(username: str):
+    user = con.execute("select * from user where username = ?", (username,)).fetchone()
+    if user:
+        return User(**user)
+    return None
 
 
-def authenticate_user(fake_db, username: str, password: str):
-    user = get_user(fake_db, username)
+def authenticate_user(username: str, password: str):
+    user = get_user(username)
     if not user:
         return False
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(password, user.salt, user.hashed_password):
         return False
     return user
 
@@ -115,7 +93,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         token_data = TokenData(username=username)
     except InvalidTokenError:
         raise credentials_exception
-    user = get_user(fake_users_db, username=token_data.username)
+    user = get_user(token_data.username)
     if user is None:
         raise credentials_exception
     return user
@@ -130,10 +108,8 @@ async def get_current_active_user(
 
 
 @app.post("/token")
-async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-) -> Token:
-    user = authenticate_user(fake_users_db, form_data.username, form_data.password)
+async def login_for_access_token(username: str, password: str) -> Token:
+    user = authenticate_user(username, password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -187,7 +163,7 @@ async def get_cards():
 @app.post("/new_user/")
 async def new_user(user: UserDTO):
     salt = generate_random_string(50)
-    hashed_password = hashlib.sha256(user.unhashed_password.encode('utf-8') + salt.encode('utf-8')).hexdigest()
+    hashed_password = password_hash.hash(user.unhashed_password + salt)
     cur.execute("INSERT INTO user (username, hashed_password, salt) VALUES (?, ?, ?)",
                 (user.username, hashed_password, salt))
     con.commit()
